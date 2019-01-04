@@ -1,5 +1,9 @@
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
@@ -23,11 +27,19 @@ public class NewMatrix {
     private static final File MATRIX_DB = new File("target/matrix-new-db");
     private GraphDatabaseService graphDb;
     private long matrixNodeId;
+    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static LocalDateTime startTime;
+    private static LocalDateTime endTime;
 
     public static void main(String[] args) throws IOException {
         NewMatrix matrix = new NewMatrix();
         matrix.setUp();
         matrix.printMatrixHackers();
+        endTime = LocalDateTime.now();
+        System.out.println("End time is "+dtf.format(endTime));
+
+        System.out.println("Total execution time is ="+(endTime.getSecond()-startTime.getSecond())+"s");
+
         matrix.shutdown();
     }
 
@@ -35,6 +47,8 @@ public class NewMatrix {
         FileUtils.deleteRecursively(MATRIX_DB);
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(MATRIX_DB);
         registerShutdownHook();
+        startTime = LocalDateTime.now();
+        System.out.println("Start time is "+dtf.format(startTime));
         createNodespace();
     }
 
@@ -98,46 +112,46 @@ public class NewMatrix {
             relationship1.setProperty("relName", " HELP ");
 
             Relationship relationship2 = one.createRelationshipTo(three, RelTypes.KNOWS);
-            relationship1.setProperty("relName", " KNOWS ");
+            relationship2.setProperty("relName", " KNOWS ");
 
             Relationship relationship3 = two.createRelationshipTo(four, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship3.setProperty("relName", " FRIEND ");
 
             Relationship relationship4 = two.createRelationshipTo(five, RelTypes.KNOWS);
-            relationship1.setProperty("relName", " KNOWS ");
+            relationship4.setProperty("relName", " KNOWS ");
 
             Relationship relationship5 = three.createRelationshipTo(six, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship5.setProperty("relName", " FRIEND ");
 
             Relationship relationship6 = three.createRelationshipTo(seven, RelTypes.KNOWS);
-            relationship1.setProperty("relName", " KNOWS ");
+            relationship6.setProperty("relName", " KNOWS ");
 
             Relationship relationship7 = five.createRelationshipTo(eight, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship7.setProperty("relName", " FRIEND ");
 
             Relationship relationship8 = six.createRelationshipTo(eight, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship8.setProperty("relName", " FRIEND ");
 
             Relationship relationship9 = eight.createRelationshipTo(nine, RelTypes.HELP);
-            relationship1.setProperty("relName", " HELP ");
+            relationship9.setProperty("relName", " HELP ");
 
             Relationship relationship10 = eight.createRelationshipTo(ten, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship10.setProperty("relName", " FRIEND ");
 
             Relationship relationship11 = ten.createRelationshipTo(nine, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship11.setProperty("relName", " FRIEND ");
 
             Relationship relationship12 = nine.createRelationshipTo(eleven, RelTypes.HELP);
-            relationship1.setProperty("relName", " HELP ");
+            relationship12.setProperty("relName", " HELP ");
 
             Relationship relationship13 = nine.createRelationshipTo(twelve, RelTypes.KNOWS);
-            relationship1.setProperty("relName", " KNOWS ");
+            relationship13.setProperty("relName", " KNOWS ");
 
             Relationship relationship14 = twelve.createRelationshipTo(thirteen, RelTypes.HELP);
-            relationship1.setProperty("relName", " HELP ");
+            relationship14.setProperty("relName", " HELP ");
 
             Relationship relationship15 = twelve.createRelationshipTo(fourteen, RelTypes.FRIEND);
-            relationship1.setProperty("relName", " FRIEND ");
+            relationship15.setProperty("relName", " FRIEND ");
 
             tx.success();
         }
