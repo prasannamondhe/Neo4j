@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
@@ -34,12 +32,12 @@ public class NewMatrix {
     public static void main(String[] args) throws IOException {
         NewMatrix matrix = new NewMatrix();
         matrix.setUp();
+        System.out.println("\n");
         matrix.printMatrixHackers();
         endTime = LocalDateTime.now();
+        System.out.println("\n");
         System.out.println("End time is "+dtf.format(endTime));
-
         System.out.println("Total execution time is ="+(endTime.getSecond()-startTime.getSecond())+"s");
-
         matrix.shutdown();
     }
 
@@ -188,9 +186,6 @@ public class NewMatrix {
     }
 
     private void registerShutdownHook() {
-        // Registers a shutdown hook for the Neo4j instance so that it
-        // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-        // running example before it's completed)
         Runtime.getRuntime().addShutdownHook(new Thread(() -> graphDb.shutdown()));
     }
 }
