@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
@@ -24,7 +23,6 @@ public class NewMatrix {
     private static final File MATRIX_DB = new File("target/matrix-new-db");
     private GraphDatabaseService graphDb;
     private long matrixNodeId;
-    private Random random = new Random();
     private static long starts;
     private static long ends;
 
@@ -60,45 +58,59 @@ public class NewMatrix {
 
             Node one = graphDb.createNode(Labels.USER);
             one.setProperty("name", "1");
+            one.setProperty("salary", 100);
 
             Node two = graphDb.createNode(Labels.USER);
             two.setProperty("name", "2");
+            two.setProperty("salary", 120);
 
             Node three = graphDb.createNode(Labels.USER);
             three.setProperty("name", "3");
+            three.setProperty("salary",140);
 
             Node four = graphDb.createNode(Labels.USER);
             four.setProperty("name", "4");
+            four.setProperty("salary",160);
 
             Node five = graphDb.createNode(Labels.USER);
             five.setProperty("name", "5");
+            five.setProperty("salary",180);
 
             Node six = graphDb.createNode(Labels.USER);
             six.setProperty("name", "6");
+            six.setProperty("salary",200);
 
             Node seven = graphDb.createNode(Labels.USER);
             seven.setProperty("name", "7");
+            seven.setProperty("salary",220);
 
             Node eight = graphDb.createNode(Labels.USER);
             eight.setProperty("name", "8");
+            eight.setProperty("salary",240);
 
             Node nine = graphDb.createNode(Labels.USER);
             nine.setProperty("name", "9");
+            nine.setProperty("salary",260);
 
             Node ten = graphDb.createNode(Labels.USER);
             ten.setProperty("name", "10");
+            ten.setProperty("salary",280);
 
             Node eleven = graphDb.createNode(Labels.USER);
             eleven.setProperty("name", "11");
+            eleven.setProperty("salary",300);
 
             Node twelve = graphDb.createNode(Labels.USER);
             twelve.setProperty("name", "12");
+            twelve.setProperty("salary",320);
 
             Node thirteen = graphDb.createNode(Labels.USER);
             thirteen.setProperty("name", "13");
+            thirteen.setProperty("salary",340);
 
             Node fourteen = graphDb.createNode(Labels.USER);
             fourteen.setProperty("name", "14");
+            fourteen.setProperty("salary",360);
 
 
             matrix.createRelationshipTo(one, RelTypes.NEO_NODE);
@@ -145,7 +157,7 @@ public class NewMatrix {
             Relationship relationship14 = twelve.createRelationshipTo(thirteen, RelTypes.HELP);
             relationship14.setProperty("relName", " HELP ");
 
-            Relationship relationship15 = twelve.createRelationshipTo(fourteen, RelTypes.HELP);
+            Relationship relationship15 = twelve.createRelationshipTo(fourteen, RelTypes.FRIEND);
             relationship15.setProperty("relName", " FRIEND ");
 
             tx.success();
@@ -159,15 +171,12 @@ public class NewMatrix {
             Node stepNode = startNode;
             int totalSalary = 0;
             int counter = 0;
-            stepNode.setProperty("salary", 2000);
             totalSalary = (int) stepNode.getProperty("salary");
             while (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.FRIEND,RelTypes.KNOWS)) {
                 if (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.FRIEND)) {
                     try {
                         Node endNode = stepNode.getRelationships(Direction.OUTGOING, RelTypes.FRIEND).iterator().next().getOtherNode(stepNode);
-                        int salary = random.nextInt(1000);
-                        endNode.setProperty("salary", salary);
-                        totalSalary = totalSalary + (int) endNode.getProperty("salary", salary);
+                        totalSalary = totalSalary + (int) endNode.getProperty("salary");
                         System.out.println(stepNode.getProperties("name") + " -> " + endNode.getProperty("name") + " Level is " + ++counter + " Total salary at this level is " + totalSalary);
                         stepNode = endNode;
                     } catch (NotFoundException e) {
@@ -176,9 +185,7 @@ public class NewMatrix {
                 } else if (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.KNOWS)) {
                     try {
                         Node endNode = stepNode.getRelationships(Direction.OUTGOING, RelTypes.KNOWS).iterator().next().getOtherNode(stepNode);
-                        int salary = random.nextInt(1000);
-                        endNode.setProperty("salary", salary);
-                        totalSalary = totalSalary + (int) endNode.getProperty("salary", salary);
+                        totalSalary = totalSalary + (int) endNode.getProperty("salary");
                         System.out.println(stepNode.getProperties("name") + " -> " + endNode.getProperty("name") + " Level is " + ++counter + " Total salary at this level is " + totalSalary);
                         stepNode = endNode;
                     } catch (NotFoundException e) {
