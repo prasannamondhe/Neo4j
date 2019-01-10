@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Random;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
@@ -25,19 +24,18 @@ public class NewMatrix {
     private static final File MATRIX_DB = new File("target/matrix-new-db");
     private GraphDatabaseService graphDb;
     private long matrixNodeId;
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static LocalDateTime startTime;
-    private static LocalDateTime endTime;
+    private Random random = new Random();
+    private static long starts;
+    private static long ends;
 
     public static void main(String[] args) throws IOException {
         NewMatrix matrix = new NewMatrix();
         matrix.setUp();
         System.out.println("\n");
         matrix.printMatrixHackers();
-        endTime = LocalDateTime.now();
         System.out.println("\n");
-        System.out.println("End time is "+dtf.format(endTime));
-        System.out.println("Total execution time is ="+(endTime.getSecond()-startTime.getSecond())+"s");
+        ends = System.currentTimeMillis();
+        System.out.println("Total duration :"+(ends-starts)/1000.0);
         matrix.shutdown();
     }
 
@@ -45,8 +43,7 @@ public class NewMatrix {
         FileUtils.deleteRecursively(MATRIX_DB);
         graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(MATRIX_DB);
         registerShutdownHook();
-        startTime = LocalDateTime.now();
-        System.out.println("Start time is "+dtf.format(startTime));
+        starts = System.currentTimeMillis();
         createNodespace();
     }
 
@@ -148,7 +145,7 @@ public class NewMatrix {
             Relationship relationship14 = twelve.createRelationshipTo(thirteen, RelTypes.HELP);
             relationship14.setProperty("relName", " HELP ");
 
-            Relationship relationship15 = twelve.createRelationshipTo(fourteen, RelTypes.FRIEND);
+            Relationship relationship15 = twelve.createRelationshipTo(fourteen, RelTypes.HELP);
             relationship15.setProperty("relName", " FRIEND ");
 
             tx.success();
@@ -158,27 +155,34 @@ public class NewMatrix {
 
     public void printMatrixHackers() {
         try (Transaction tx = graphDb.beginTx()) {
-            Node startNode = graphDb.findNode(Labels.USER,"name","1");
-            while(startNode.hasRelationship(Direction.OUTGOING)){
-                if(startNode.hasRelationship(Direction.OUTGOING,RelTypes.FRIEND)) {
-                    for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING, RelTypes.FRIEND)) {
-                        try {
-                            Node endNode = relationship.getOtherNode(startNode);
-                            System.out.println(startNode.getProperties("name") + " -> " + endNode.getProperty("name"));
-                            startNode = endNode;
-                        }catch (NotFoundException e){
-                            System.out.println("No more relationships to endnode");
-                        }
+            Node startNode = graphDb.findNode(Labels.USER, "name", "1");
+            Node stepNode = startNode;
+            int totalSalary = 0;
+            int counter = 0;
+            stepNode.setProperty("salary", 2000);
+            totalSalary = (int) stepNode.getProperty("salary");
+            while (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.FRIEND,RelTypes.KNOWS)) {
+                if (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.FRIEND)) {
+                    try {
+                        Node endNode = stepNode.getRelationships(Direction.OUTGOING, RelTypes.FRIEND).iterator().next().getOtherNode(stepNode);
+                        int salary = random.nextInt(1000);
+                        endNode.setProperty("salary", salary);
+                        totalSalary = totalSalary + (int) endNode.getProperty("salary", salary);
+                        System.out.println(stepNode.getProperties("name") + " -> " + endNode.getProperty("name") + " Level is " + ++counter + " Total salary at this level is " + totalSalary);
+                        stepNode = endNode;
+                    } catch (NotFoundException e) {
+                        System.out.println("No more relationships to endnode");
                     }
-                }else if(startNode.hasRelationship(Direction.OUTGOING,RelTypes.KNOWS)){
-                    for (Relationship relationship : startNode.getRelationships(Direction.OUTGOING, RelTypes.KNOWS)) {
-                        try {
-                            Node endNode = relationship.getOtherNode(startNode);
-                            System.out.println(startNode.getProperties("name") + " -> " + endNode.getProperty("name"));
-                            startNode = endNode;
-                        }catch (NotFoundException e){
-                            System.out.println("No more relationships to endnode");
-                        }
+                } else if (stepNode.hasRelationship(Direction.OUTGOING, RelTypes.KNOWS)) {
+                    try {
+                        Node endNode = stepNode.getRelationships(Direction.OUTGOING, RelTypes.KNOWS).iterator().next().getOtherNode(stepNode);
+                        int salary = random.nextInt(1000);
+                        endNode.setProperty("salary", salary);
+                        totalSalary = totalSalary + (int) endNode.getProperty("salary", salary);
+                        System.out.println(stepNode.getProperties("name") + " -> " + endNode.getProperty("name") + " Level is " + ++counter + " Total salary at this level is " + totalSalary);
+                        stepNode = endNode;
+                    } catch (NotFoundException e) {
+                        System.out.println("No more relationships to endnode");
                     }
                 }
             }
